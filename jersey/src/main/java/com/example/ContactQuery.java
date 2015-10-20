@@ -28,7 +28,7 @@ public class ContactQuery {
       while ( rs.next() )
       {
         Contact contact = new Contact(
-          rs.getString("id") == null ? null : rs.getInt("id"), // I don\t know how do it better :(
+          rs.getString("id") == null ? null : rs.getInt("id"), // I don\t know how to do it better :(
           rs.getString("email"),
           rs.getString("first_name"),
           rs.getString("last_name"),
