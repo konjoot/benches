@@ -67,7 +67,7 @@ public class ContactQuery {
             + " middle_name,"
             + " date_of_birth,"
             + " sex"
-      + " from users u"
+      + " from users"
       + " where deleted_at is null"
       + " order by id"
       + " limit ?"
