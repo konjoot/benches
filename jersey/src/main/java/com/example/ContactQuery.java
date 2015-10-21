@@ -53,33 +53,25 @@ public class ContactQuery {
     return collection;
   }
 
-  private PreparedStatement prepareStatement() {
+  private PreparedStatement prepareStatement() throws SQLException {
     if (conn == null) { return null; }
 
-    PreparedStatement ps = null;
+    PreparedStatement ps = conn.prepareStatement(
+      "select id,"
+          + " email,"
+          + " first_name,"
+          + " last_name,"
+          + " middle_name,"
+          + " date_of_birth,"
+          + " sex"
+    + " from users"
+    + " where deleted_at is null"
+    + " order by id"
+    + " limit ?"
+    + " offset ?");
 
-    try {
-      ps = conn.prepareStatement(
-        "select id,"
-            + " email,"
-            + " first_name,"
-            + " last_name,"
-            + " middle_name,"
-            + " date_of_birth,"
-            + " sex"
-      + " from users"
-      + " where deleted_at is null"
-      + " order by id"
-      + " limit ?"
-      + " offset ?");
-
-      ps.setInt(1, limit());
-      ps.setInt(2, offset());
-
-    }
-    catch (SQLException e) {
-      System.err.println(e.getMessage());
-    }
+    ps.setInt(1, limit());
+    ps.setInt(2, offset());
 
     return ps;
   }
