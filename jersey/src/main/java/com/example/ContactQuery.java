@@ -21,8 +21,8 @@ public class ContactQuery {
   private Connection conn;
 
   public ContactQuery(int page, int perPage) {
-    this.page = page <= 0 ? 1 : page ;
-    this.perPage = perPage;
+    this.page = page <= 0 ? 1 : page;
+    this.perPage = perPage <= 0 ? 1 : perPage;
     this.conn = new DBConn().get();
     this.collection = new ContactList();
   }
