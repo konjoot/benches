@@ -1,5 +1,6 @@
 package com.example;
 
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -11,6 +12,7 @@ public class Contact {
   public String middleName;
   public String dateOfBirth;
   public Integer sex;
+  public ArrayList<Profile> profiles;
 
   public Contact() {
     this.id = null;
@@ -20,6 +22,7 @@ public class Contact {
     this.middleName = null;
     this.dateOfBirth = null;
     this.sex = null;
+    this.profiles = null;
   }
 
   public Contact(
@@ -38,5 +41,6 @@ public class Contact {
     this.middleName = middleName;
     this.dateOfBirth = dateOfBirth;
     this.sex = sex;
+    this.profiles = null;
   }
 }
