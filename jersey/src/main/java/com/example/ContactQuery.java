@@ -15,14 +15,17 @@ import java.util.NoSuchElementException;
 
 
 public class ContactQuery {
-  private int page;
-  private int perPage;
+  private int limit;
+  private int offset;
   private ContactList collection;
   private Connection conn;
 
   public ContactQuery(int page, int perPage) {
-    this.page = page <= 0 ? 1 : page;
-    this.perPage = perPage <= 0 ? 1 : perPage;
+    page = page < 1 ? 1 : page;
+    perPage = perPage < 1 ? 1 : perPage;
+
+    this.limit = perPage;
+    this.offset = perPage * (page - 1);
     this.conn = new DBConn().get();
     this.collection = new ContactList();
   }
@@ -173,8 +176,8 @@ public class ContactQuery {
     + " limit ?"
     + " offset ?");
 
-    ps.setInt(1, limit());
-    ps.setInt(2, offset());
+    ps.setInt(1, limit);
+    ps.setInt(2, offset);
 
     return ps;
   }
@@ -217,14 +220,6 @@ public class ContactQuery {
     ps.setArray(1, array);
 
     return ps;
-  }
-
-  private int limit() {
-    return perPage;
-  }
-
-  private int offset() {
-    return perPage * (page - 1);
   }
 
   private void close(AutoCloseable... c) {
