@@ -20,7 +20,7 @@ func getContacts(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	perPage, err := strconv.Atoi(r.FormValue("perPage"))
+	perPage, err := strconv.Atoi(r.FormValue("per_page"))
 	if err != nil {
 		perPage = 100
 	}
