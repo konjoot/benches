@@ -1,7 +1,7 @@
 package main
 
-func NewContactList() ContactList {
-	return make(ContactList, 0, 100)
+func NewContactList(size int) ContactList {
+	return make(ContactList, 0, size)
 }
 
-type ContactList []Contact
+type ContactList []*Contact
