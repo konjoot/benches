@@ -1,11 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 )
 
+// todo: change fmt to log
 func NewContactQuery(page int, perPage int) *ContactQuery {
 	if page < 1 {
 		page = 1
@@ -17,45 +18,67 @@ func NewContactQuery(page int, perPage int) *ContactQuery {
 	return &ContactQuery{
 		limit:      perPage,
 		offset:     perPage * (page - 1),
-		conn:       NewDBConn(),
-		collection: NewContactList(),
+		collection: NewContactList(perPage),
 	}
 }
 
 type ContactQuery struct {
 	limit      int
 	offset     int
-	collection []Contact
-	conn       *sqlx.DB
+	collection []*Contact
+	conn       *sql.DB
 }
 
 func (cq *ContactQuery) All() ContactList {
+	cq.conn = NewDBConn()
+	defer cq.conn.Close()
+
 	err := cq.fillUsers()
 	if err != nil {
 		fmt.Println(err)
-		return NewContactList()
+		return NewContactList(0)
 	}
 	return cq.collection
 }
 
 func (cq *ContactQuery) fillUsers() (err error) {
 	ps, err := cq.selectUsersStmt()
+	defer ps.Close()
 	if err != nil {
 		return
 	}
-	fmt.Println(ps)
 
-	err = ps.Select(cq.collection, cq.limit, cq.offset)
+	rows, err := ps.Query(cq.limit, cq.offset)
+	defer rows.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for rows.Next() {
+		contact := NewContact()
+		rows.Scan(
+			&contact.Id,
+			&contact.Email,
+			&contact.FirstName,
+			&contact.LastName,
+			&contact.MiddleName,
+			&contact.DateOfBirth,
+			&contact.Sex,
+		)
+
+		cq.collection = append(cq.collection, contact)
+	}
 
 	return
 }
 
-func (cq *ContactQuery) selectUsersStmt() (*sqlx.Stmt, error) {
+func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
 	if cq.conn == nil {
 		return nil, errors.New("Can't connect to DB")
 	}
 
-	return cq.conn.Preparex(`
+	return cq.conn.Prepare(`
     select  id,
             email,
             first_name,
@@ -66,6 +89,6 @@ func (cq *ContactQuery) selectUsersStmt() (*sqlx.Stmt, error) {
       from users
       where deleted_at is null
       order by id
-      limit ?
-      offset ?`)
+      limit $1
+      offset $2`)
 }
