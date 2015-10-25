@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -19,6 +20,12 @@ func getContacts(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Print(err)
+		}
+	}()
+
 	page, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
 		page = 1
