@@ -29,8 +29,9 @@ type ContactQuery struct {
 }
 
 func (cq *ContactQuery) All() ContactList {
-	cq.conn = NewDBConn()
-	defer cq.conn.Close()
+	if cq.conn = NewDBConn(); cq.conn != nil {
+		defer cq.conn.Close()
+	}
 
 	err := cq.fillUsers()
 	if err != nil {
@@ -42,17 +43,17 @@ func (cq *ContactQuery) All() ContactList {
 
 func (cq *ContactQuery) fillUsers() (err error) {
 	ps, err := cq.selectUsersStmt()
-	defer ps.Close()
 	if err != nil {
 		return
 	}
+	defer ps.Close()
 
 	rows, err := ps.Query(cq.limit, cq.offset)
-	defer rows.Close()
 	if err != nil {
 		log.Print(err)
 		return
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		contact := NewContact()
