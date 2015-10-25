@@ -50,7 +50,6 @@ func (cq *ContactQuery) fillUsers() (err error) {
 
 	rows, err := ps.Query(cq.limit, cq.offset)
 	if err != nil {
-		log.Print(err)
 		return
 	}
 	defer rows.Close()
