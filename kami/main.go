@@ -14,7 +14,11 @@ func main() {
 	kami.Serve()
 }
 
-func getContacts(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func getContacts(
+	ctx context.Context,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	page, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
 		page = 1
