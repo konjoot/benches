@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"github.com/lib/pq"
 	"reflect"
+
+	"github.com/lib/pq"
 )
 
 func NewContact() *Contact {
@@ -23,8 +24,15 @@ type Contact struct {
 	Sex         sql.NullInt64
 }
 
-// todo: add panic recover
-func (c Contact) MarshalJSON() ([]byte, error) {
+func (c Contact) MarshalJSON() (res []byte, err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			if ee, ok := e.(error); ok {
+				err = ee
+			}
+		}
+	}()
+
 	buffer := bytes.NewBuffer([]byte("{"))
 
 	rtype := reflect.TypeOf(&c).Elem()
@@ -49,14 +57,14 @@ func (c Contact) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	_, err := buffer.Write(bytes.Join(result, []byte(",")))
-	if err != nil {
-		return nil, err
+	jsonData := bytes.Join(result, []byte(","))
+	if _, err = buffer.Write(jsonData); err != nil {
+		return
 	}
 
-	if _, err := buffer.Write([]byte(`}`)); err != nil {
-		return nil, err
+	if _, err = buffer.Write([]byte(`}`)); err != nil {
+		return
 	}
 
-	return buffer.Bytes(), nil
+	return buffer.Bytes(), err
 }
