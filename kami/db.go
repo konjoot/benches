@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -22,7 +23,7 @@ var DBUrl string = fmt.Sprintf(
 func NewDBConn() (db *sql.DB) {
 	db, err := sql.Open("postgres", DBUrl)
 	if err != nil {
-		fmt.Println(err)
+		log.Print(err)
 		return nil
 	}
 

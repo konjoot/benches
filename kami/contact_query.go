@@ -3,10 +3,9 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"log"
 )
 
-// todo: change fmt to log
 func NewContactQuery(page int, perPage int) *ContactQuery {
 	if page < 1 {
 		page = 1
@@ -35,7 +34,7 @@ func (cq *ContactQuery) All() ContactList {
 
 	err := cq.fillUsers()
 	if err != nil {
-		fmt.Println(err)
+		log.Print(err)
 		return NewContactList(0)
 	}
 	return cq.collection
@@ -51,7 +50,7 @@ func (cq *ContactQuery) fillUsers() (err error) {
 	rows, err := ps.Query(cq.limit, cq.offset)
 	defer rows.Close()
 	if err != nil {
-		fmt.Println(err)
+		log.Print(err)
 		return
 	}
 
