@@ -133,17 +133,17 @@ func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
 
 	return cq.conn.Prepare(`
 		select	id,
-						email,
-						first_name,
-						last_name,
-						middle_name,
-						date_of_birth,
-						sex
-			from users
-			where deleted_at is null
-			order by id
-			limit $1
-			offset $2`)
+		      	email,
+		      	first_name,
+		      	last_name,
+		      	middle_name,
+		      	date_of_birth,
+		      	sex
+		  from users
+		  where deleted_at is null
+		  order by id
+		  limit $1
+		  offset $2`)
 }
 
 func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
@@ -153,10 +153,10 @@ func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
 
 	return cq.conn.Prepare(`
 		select	id,
-						type,
-						user_id
-			from profiles
-			where deleted_at is null
-				and user_id = any($1::integer[])
-			order by user_id, id`)
+		      	type,
+		      	user_id
+		  from profiles
+		  where deleted_at is null
+		    and user_id = any($1::integer[])
+		  order by user_id, id`)
 }
