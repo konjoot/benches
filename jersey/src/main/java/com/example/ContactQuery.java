@@ -26,12 +26,16 @@ public class ContactQuery {
 
     this.limit = perPage;
     this.offset = perPage * (page - 1);
-    this.conn = new DBConn().get();
+    this.conn = null;
     this.collection = new ContactList();
   }
 
   public ContactList all() {
+    this.conn = new DBConn().get();
+
     if (fillUsers()) { fillDependentData(); }
+
+    close(this.conn);
 
     return collection;
   }
