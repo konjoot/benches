@@ -215,7 +215,7 @@ public class ContactQuery {
       + " on sb.id = c.subject_id"
     + " where p.deleted_at is null"
       + " and p.user_id = any(?)"
-    + " order by p.user_id",
+    + " order by p.user_id, p.id",
     ResultSet.TYPE_SCROLL_INSENSITIVE,
     ResultSet.CONCUR_READ_ONLY);
 
