@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	kami.Get("/contacts/", getContacts)
+	kami.Get("/contacts", getContacts)
 	kami.Serve()
 }
 
@@ -36,6 +36,12 @@ func getContacts(
 		perPage = 100
 	}
 
-	json.NewEncoder(w).Encode(
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	err = json.NewEncoder(w).Encode(
 		NewContactQuery(page, perPage).All())
+
+	if err != nil {
+		log.Print(err)
+	}
 }
