@@ -72,3 +72,8 @@ func (c ContactList) Any() bool {
 func (c ContactList) Items() []*Contact {
 	return c.list
 }
+
+func (c *ContactList) First() *Contact {
+	c.Next()
+	return c.Current()
+}
