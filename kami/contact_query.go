@@ -101,11 +101,7 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 	defer rows.Close()
 
 	var userId sql.NullInt64
-	var current *Contact
-
-	if ok := cq.collection.Next(); ok {
-		current = cq.collection.Current()
-	}
+	current := cq.collection.First()
 
 	for rows.Next() {
 
