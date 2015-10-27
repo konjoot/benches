@@ -10,7 +10,7 @@ import (
 
 const (
 	DBHOST   string = "localhost"
-	DATABASE string = "lms2_development"
+	DATABASE string = "lms2_development_2"
 	DBUSER   string = "lms"
 	DBPASS   string = ""
 	SSLMODE  string = "disable"
