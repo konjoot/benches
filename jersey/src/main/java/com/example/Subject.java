@@ -13,10 +13,10 @@ public class Subject {
   }
 
   public Subject(
-    Integer id,
+    String id,
     String name
   ) {
-    this.id = id;
+    this.id = id == null ? null : new Integer(id);
     this.name = name;
   }
 }
