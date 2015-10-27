@@ -23,13 +23,42 @@ public class Profile {
   }
 
   public Profile(
-    Integer id,
-    String type
+    String id,
+    String type,
+    String classUnitId,
+    String classUnitName,
+    String enlistedOn,
+    String leftOn,
+    String schoolId,
+    String schoolName,
+    String schoolGuid
   ) {
-    this.id = id;
+    this.id = id == null ? null : new Integer(id);
     this.type = type;
-    this.classUnit = null;
-    this.school = null;
     this.subjects = null;
+
+    ClassUnit cu = new ClassUnit(
+      classUnitId,
+      classUnitName,
+      enlistedOn,
+      leftOn
+    );
+
+    School s = new School(
+      schoolId,
+      schoolName,
+      schoolGuid
+    );
+
+    this.classUnit = cu.id == null ? null : cu;
+    this.school = s.id == null ? null : s;
+  }
+
+  public void addSubject(Subject subject) {
+    if (subjects == null) {
+      subjects = new ArrayList<Subject>();
+    }
+
+    subjects.add(subject);
   }
 }
