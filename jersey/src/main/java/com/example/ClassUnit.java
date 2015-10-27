@@ -17,12 +17,12 @@ public class ClassUnit {
   }
 
   public ClassUnit(
-    Integer id,
+    String id,
     String name,
     String enlistedOn,
     String leftOn
   ) {
-    this.id = id;
+    this.id = id == null ? null : new Integer(id);
     this.name = name;
     this.enlistedOn = enlistedOn;
     this.leftOn = leftOn;
