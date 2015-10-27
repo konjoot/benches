@@ -102,7 +102,7 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 
 	var userId sql.NullInt64
 
-	current := cq.collection.First()
+	current := cq.collection.Next()
 
 	if current == nil {
 		return errors.New("Empty collection")
@@ -128,8 +128,8 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 		)
 
 		for current.Id != userId {
-			if cq.collection.Next() {
-				current = cq.collection.Current()
+			if next := cq.collection.Next(); next != nil {
+				current = next
 			} else {
 				break
 			}
