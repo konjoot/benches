@@ -139,11 +139,9 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 			break
 		}
 
-		if lastPr := current.LastProfile(); lastPr != nil {
-			if lastPr.Id != profile.Id {
-				current.Profiles = append(current.Profiles, profile)
-			}
-		} else {
+		if lastPr := current.LastProfile(); lastPr == nil {
+			current.Profiles = append(current.Profiles, profile)
+		} else if lastPr.Id != profile.Id {
 			current.Profiles = append(current.Profiles, profile)
 		}
 
