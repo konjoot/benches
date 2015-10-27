@@ -24,3 +24,13 @@ type Contact struct {
 func (c *Contact) MarshalJSON() ([]byte, error) {
 	return MarshalJSON(c)
 }
+
+func (c *Contact) LastProfile() *Profile {
+	count := len(c.Profiles)
+
+	if count > 0 {
+		return c.Profiles[count-1]
+	}
+
+	return nil
+}
