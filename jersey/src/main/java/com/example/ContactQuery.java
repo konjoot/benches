@@ -51,13 +51,13 @@ public class ContactQuery {
       while ( rs.next() )
       {
         Contact contact = new Contact(
-          rs.getString("id") == null ? null : rs.getInt("id"), // I don\t know how to do it better :(
+          rs.getString("id"),
           rs.getString("email"),
           rs.getString("first_name"),
           rs.getString("last_name"),
           rs.getString("middle_name"),
           rs.getString("date_of_birth"),
-          rs.getString("sex") == null ? null : rs.getInt("sex") // the same
+          rs.getString("sex")
         );
 
         collection.add(contact);
@@ -98,63 +98,45 @@ public class ContactQuery {
           current = i.next();
         }
 
+        if (userId != current.id){
+          continue;
+        }
+
         Profile profile = new Profile(
-          rs.getInt("id"),
-          rs.getString("type")
+          rs.getString("id"),
+          rs.getString("type"),
+          rs.getString("class_unit_id"),
+          rs.getString("class_unit_name"),
+          rs.getString("enlisted_on"),
+          rs.getString("left_on"),
+          rs.getString("school_id"),
+          rs.getString("school_name"),
+          rs.getString("school_guid")
         );
 
-        int classUnitId = rs.getInt("class_unit_id");
+        if (profile.id == null) { continue; }
 
-        if (classUnitId > 0){
-          profile.classUnit = new ClassUnit(
-            classUnitId,
-            rs.getString("name"),
-            rs.getString("enlisted_on"),
-            rs.getString("left_on")
-          );
+        Profile lastPr = current.lastProfile();
+
+        if (lastPr == null) {
+          current.addProfile(profile);
+        } else if (!lastPr.id.equals(profile.id)) {
+          current.addProfile(profile);
         }
 
-        int schoolId = rs.getInt("school_id");
+        Subject subject = new Subject(
+          rs.getString("subject_id"),
+          rs.getString("subject_name")
+        );
 
-        if (schoolId > 0){
-          profile.school = new School(
-            schoolId,
-            rs.getString("short_name"),
-            rs.getString("guid")
-          );
+        if (subject.id != null) {
+          current.lastProfile().addSubject(subject);
         }
-
-        int subjectId = rs.getInt("subject_id");
-
-        while (subjectId > 0 && profile.id == rs.getInt("id"))
-        {
-          Subject subject = new Subject(
-            subjectId,
-            rs.getString("subject_name")
-          );
-
-          if (profile.subjects == null) {
-            profile.subjects = new ArrayList<Subject>();
-          }
-
-          profile.subjects.add(subject);
-
-          rs.next();
-        }
-
-        if (rs.getInt("id") != profile.id){
-          rs.previous();
-        }
-
-        if (current.profiles == null) {
-          current.profiles = new ArrayList<Profile>();
-        }
-
-        current.profiles.add(profile);
       }
     }
     catch (Exception e)
     {
+      e.printStackTrace();
       System.err.println(e.getMessage());
     }
     finally
@@ -196,10 +178,10 @@ public class ContactQuery {
           + " p.class_unit_id,"
           + " p.enlisted_on,"
           + " p.left_on,"
-          + " cu.name,"
+          + " cu.name as class_unit_name,"
           + " p.school_id,"
-          + " sc.guid,"
-          + " sc.short_name,"
+          + " sc.guid as school_guid,"
+          + " sc.short_name as school_name,"
           + " c.subject_id,"
           + " sb.name as subject_name"
     + " from profiles p"
@@ -215,9 +197,7 @@ public class ContactQuery {
       + " on sb.id = c.subject_id"
     + " where p.deleted_at is null"
       + " and p.user_id = any(?)"
-    + " order by p.user_id, p.id",
-    ResultSet.TYPE_SCROLL_INSENSITIVE,
-    ResultSet.CONCUR_READ_ONLY);
+    + " order by p.user_id, p.id");
 
     Array array = conn.createArrayOf("integer", collection.ids());
 
