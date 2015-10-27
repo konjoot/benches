@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/guregu/kami"
-	"golang.org/x/net/context"
 )
 
 func main() {
@@ -16,7 +15,6 @@ func main() {
 }
 
 func getContacts(
-	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
