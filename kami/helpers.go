@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"reflect"
 )
 
 func MarshalJSON(i interface{}) (res []byte, err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			if ee, ok := e.(error); ok {
-				err = ee
-			}
+			err = errors.New(fmt.Sprintf("MarshalJSON error: %s\n", e))
 		}
 	}()
 
