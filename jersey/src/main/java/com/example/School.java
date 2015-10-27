@@ -15,11 +15,11 @@ public class School {
   }
 
   public School(
-    Integer id,
+    String id,
     String name,
     String guid
   ) {
-    this.id = id;
+    this.id = id == null ? null : new Integer(id);
     this.name = name;
     this.guid = guid;
   }
