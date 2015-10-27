@@ -136,7 +136,7 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 		}
 
 		if current.Id != userId {
-			break
+			continue
 		}
 
 		if lastPr := current.LastProfile(); lastPr == nil {
