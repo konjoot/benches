@@ -26,21 +26,39 @@ public class Contact {
   }
 
   public Contact(
-    Integer id,
+    String id,
     String email,
     String firstName,
     String lastName,
     String middleName,
     String dateOfBirth,
-    Integer sex
+    String sex
   ) {
-    this.id = id;
+    this.id = id == null ? null : new Integer(id);
     this.email = email;
     this.firstName = firstName;
     this.lastName = lastName;
     this.middleName = middleName;
     this.dateOfBirth = dateOfBirth;
-    this.sex = sex;
+    this.sex = sex == null ? null : new Integer(sex);
     this.profiles = null;
+  }
+
+  public Profile lastProfile() {
+    if (profiles == null) { return null; }
+
+    int size = profiles.size();
+
+    if (size == 0) { return null; }
+
+    return profiles.get(size - 1);
+  }
+
+  public void addProfile(Profile profile) {
+    if (profiles == null) {
+      profiles = new ArrayList<Profile>();
+    }
+
+    profiles.add(profile);
   }
 }
