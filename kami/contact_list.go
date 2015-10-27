@@ -15,23 +15,11 @@ type ContactList struct {
 	list []*Contact
 }
 
-func (c *ContactList) Next() bool {
+func (c *ContactList) Next() *Contact {
 	c.i++
 
 	if len(c.list) < c.i+1 {
 		c.i--
-		return false
-	}
-
-	return true
-}
-
-func (c ContactList) Current() *Contact {
-	if c.i < 0 {
-		return nil
-	}
-
-	if len(c.list) < c.i+1 {
 		return nil
 	}
 
@@ -42,27 +30,27 @@ func (c *ContactList) Append(contact *Contact) {
 	c.list = append(c.list, contact)
 }
 
-func (c ContactList) Ids() string {
-	ids := bytes.NewBuffer([]byte(`{`))
+func (c ContactList) Ids() []byte {
+	ids := bytes.NewBuffer([]byte("{"))
 
 	strings := make([][]byte, 0)
-	for c.Next() {
-		if id, err := c.Current().Id.Value(); err == nil {
+	for _, next := range c.list {
+		if id, err := next.Id.Value(); err == nil {
 			strings = append(strings, []byte(strconv.FormatInt(id.(int64), 10)))
 		}
 	}
-	result := bytes.Join(strings, []byte(`,`))
+	result := bytes.Join(strings, []byte(","))
 
 	if _, err := ids.Write(result); err != nil {
 		log.Print(err)
 	}
 
-	if _, err := ids.Write([]byte(`}`)); err != nil {
+	if _, err := ids.Write([]byte("}")); err != nil {
 		log.Print(err)
-		return "{}"
+		return []byte("{}")
 	}
 
-	return ids.String()
+	return ids.Bytes()
 }
 
 func (c ContactList) Any() bool {
@@ -71,9 +59,4 @@ func (c ContactList) Any() bool {
 
 func (c ContactList) Items() []*Contact {
 	return c.list
-}
-
-func (c *ContactList) First() *Contact {
-	c.Next()
-	return c.Current()
 }
