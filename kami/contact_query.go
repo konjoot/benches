@@ -101,26 +101,58 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 	defer rows.Close()
 
 	var userId sql.NullInt64
+
 	current := cq.collection.First()
+
+	if current == nil {
+		return errors.New("Empty collection")
+	}
 
 	for rows.Next() {
 
 		profile := NewProfile()
+		subject := NewSubject()
 		rows.Scan(
 			&profile.Id,
 			&profile.Type,
 			&userId,
+			&profile.School.Id,
+			&profile.School.Name,
+			&profile.School.Guid,
+			&profile.ClassUnit.Id,
+			&profile.ClassUnit.Name,
+			&profile.ClassUnit.EnlistedOn,
+			&profile.ClassUnit.LeftOn,
+			&subject.Id,
+			&subject.Name,
 		)
 
 		for current.Id != userId {
-
-			if ok := cq.collection.Next(); !ok {
+			if cq.collection.Next() {
+				current = cq.collection.Current()
+			} else {
 				break
 			}
-			current = cq.collection.Current()
 		}
 
-		current.Profiles = append(current.Profiles, profile)
+		if current.Id != userId {
+			break
+		}
+
+		if lastPr := current.LastProfile(); lastPr != nil {
+			if lastPr.Id != profile.Id {
+				current.Profiles = append(current.Profiles, profile)
+			}
+		} else {
+			current.Profiles = append(current.Profiles, profile)
+		}
+
+		if subject.Id.Valid {
+			current.LastProfile().Subjects = append(
+				current.LastProfile().Subjects,
+				subject,
+			)
+		}
 	}
 
 	return
@@ -152,11 +184,31 @@ func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
 	}
 
 	return cq.conn.Prepare(`
-		select	id,
-		      	type,
-		      	user_id
-		  from profiles
-		  where deleted_at is null
-		    and user_id = any($1::integer[])
-		  order by user_id, id`)
+		select	p.id,
+		      	p.type,
+		      	p.user_id,
+		      	p.school_id,
+		      	s.short_name,
+		      	s.guid,
+		      	p.class_unit_id,
+		      	cu.name,
+		      	p.enlisted_on,
+		      	p.left_on,
+		      	c.subject_id,
+		      	sb.name
+		  from profiles p
+		  left outer join schools s
+		    on s.id = p.school_id
+		    and s.deleted_at is null
+		  left outer join class_units cu
+		    on cu.id = p.class_unit_id
+		    and cu.deleted_at is null
+		  left outer join competences c
+		    on c.profile_id = p.id
+		  left outer join subjects sb
+		    on c.subject_id = sb.id
+		    and cu.deleted_at is null
+		  where p.deleted_at is null
+		    and p.user_id = any($1::integer[])
+		  order by p.user_id, p.id`)
 }
