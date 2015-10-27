@@ -33,7 +33,7 @@ func (cq *ContactQuery) All() []*Contact {
 		defer cq.conn.Close()
 	}
 
-	if ok := cq.fillUsers(); !ok {
+	if !cq.fillUsers() {
 		return NewContactList(0).Items()
 	}
 
