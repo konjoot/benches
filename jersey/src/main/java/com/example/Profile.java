@@ -4,6 +4,7 @@ import com.example.ClassUnit;
 import com.example.Subject;
 import com.example.School;
 import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -12,7 +13,7 @@ public class Profile {
   public String type;
   public ClassUnit classUnit;
   public School school;
-  public ArrayList<Subject> subjects;
+  public List<Subject> subjects;
 
   public Profile() {}
 

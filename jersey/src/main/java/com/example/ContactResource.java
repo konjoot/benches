@@ -8,7 +8,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.DefaultValue;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.example.ContactQuery;
 
@@ -18,7 +18,7 @@ public class ContactResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-  public ArrayList<Contact> getCollection(
+  public List<Contact> getCollection(
     @DefaultValue("100") @QueryParam("per_page") int perPage,
     @DefaultValue("1") @QueryParam("page") int page
   ) {

@@ -8,6 +8,7 @@ import com.example.Profile;
 import com.example.School;
 import com.example.Subject;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -16,7 +17,7 @@ import java.util.NoSuchElementException;
 public class ContactQuery {
   private int limit;
   private int offset;
-  private ArrayList<Contact> collection;
+  private List<Contact> collection;
   private Connection conn;
 
   public ContactQuery(int page, int perPage) {
@@ -29,7 +30,7 @@ public class ContactQuery {
     this.collection = new ArrayList<Contact>();
   }
 
-  public ArrayList<Contact> all() {
+  public List<Contact> all() {
     this.conn = new DBConn().get();
 
     if (fillUsers()) { fillDependentData(); }
