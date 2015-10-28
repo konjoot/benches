@@ -14,13 +14,7 @@ public class Profile {
   public School school;
   public ArrayList<Subject> subjects;
 
-  public Profile() {
-    this.id = null;
-    this.type = null;
-    this.classUnit = null;
-    this.school = null;
-    this.subjects = null;
-  }
+  public Profile() {}
 
   public Profile(
     String id,

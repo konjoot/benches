@@ -8,11 +8,7 @@ public class School {
   public String name;
   public String guid;
 
-  public School() {
-    this.id = null;
-    this.name = null;
-    this.guid = null;
-  }
+  public School() {}
 
   public School(
     String id,

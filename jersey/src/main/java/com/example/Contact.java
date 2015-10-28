@@ -14,16 +14,7 @@ public class Contact {
   public Integer sex;
   public ArrayList<Profile> profiles;
 
-  public Contact() {
-    this.id = null;
-    this.email = null;
-    this.firstName = null;
-    this.lastName = null;
-    this.middleName = null;
-    this.dateOfBirth = null;
-    this.sex = null;
-    this.profiles = null;
-  }
+  public Contact() {}
 
   public Contact(
     String id,

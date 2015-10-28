@@ -7,10 +7,7 @@ public class Subject {
   public Integer id;
   public String name;
 
-  public Subject() {
-    this.id = null;
-    this.name = null;
-  }
+  public Subject() {}
 
   public Subject(
     String id,

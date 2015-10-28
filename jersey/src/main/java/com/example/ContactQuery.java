@@ -35,7 +35,7 @@ public class ContactQuery {
 
     if (fillUsers()) { fillDependentData(); }
 
-    close(this.conn);
+    close(conn);
 
     return collection;
   }

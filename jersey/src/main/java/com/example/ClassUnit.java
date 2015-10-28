@@ -9,12 +9,7 @@ public class ClassUnit {
   public String enlistedOn;
   public String leftOn;
 
-  public ClassUnit() {
-    this.id = null;
-    this.name = null;
-    this.enlistedOn = null;
-    this.leftOn = null;
-  }
+  public ClassUnit() {}
 
   public ClassUnit(
     String id,
