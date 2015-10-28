@@ -4,7 +4,6 @@ import java.sql.*;
 
 import com.example.ClassUnit;
 import com.example.Contact;
-import com.example.ContactList;
 import com.example.Profile;
 import com.example.School;
 import com.example.Subject;
@@ -17,7 +16,7 @@ import java.util.NoSuchElementException;
 public class ContactQuery {
   private int limit;
   private int offset;
-  private ContactList collection;
+  private ArrayList<Contact> collection;
   private Connection conn;
 
   public ContactQuery(int page, int perPage) {
@@ -27,10 +26,10 @@ public class ContactQuery {
     this.limit = perPage;
     this.offset = perPage * (page - 1);
     this.conn = null;
-    this.collection = new ContactList();
+    this.collection = new ArrayList<Contact>();
   }
 
-  public ContactList all() {
+  public ArrayList<Contact> all() {
     this.conn = new DBConn().get();
 
     if (fillUsers()) { fillDependentData(); }
@@ -199,7 +198,9 @@ public class ContactQuery {
       + " and p.user_id = any(?)"
     + " order by p.user_id, p.id");
 
-    Array array = conn.createArrayOf("integer", collection.ids());
+    Array array = conn.createArrayOf(
+      "integer", collection.stream().map(c -> c.id).toArray()
+    );
 
     ps.setArray(1, array);
 
