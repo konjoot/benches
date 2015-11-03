@@ -1,12 +1,20 @@
 require "roda"
 
-class App < Roda
-  use Rack::Session::Cookie, secret: "v3rYstr0n9S3cr3t;)"
+require "./contact_query"
 
-  route do |r|
-    # /contacts
-    r.get "contacts" do
-      "There will be contacts"
+module Main
+  class App < Roda
+    use Rack::Session::Cookie, secret: "v3rYstr0n9S3cr3t;)"
+
+    plugin :indifferent_params
+    plugin :default_headers,
+      'Content-Type' => 'application/json; charset=utf-8'
+
+    route do |r|
+      # /contacts
+      r.get "contacts" do
+        ContactQuery.new(params).all().to_json
+      end
     end
   end
 end
