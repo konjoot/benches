@@ -1,4 +1,4 @@
-require './jsonable'
+require "./jsonable"
 
 module Main
   class Contact < Jsonable
