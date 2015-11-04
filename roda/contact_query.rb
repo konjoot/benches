@@ -5,10 +5,11 @@ require "./contact"
 
 module Main
   class ContactQuery
+    include DB
+
     attr_reader :limit,
                 :offset,
-                :collection,
-                :conn
+                :collection
 
     def initialize(params)
       page = get(:page, from: params, default: 1)
@@ -20,18 +21,16 @@ module Main
     end
 
     def all
-      @conn = Sequel.connect(DB_PARAMS)
       fill_users
-      conn.disconnect
       collection
     end
 
     private
 
     def fill_users
-      return if conn.nil?
+      return if db.nil?
 
-      @collection = conn[:users].select(
+      @collection = db[:users].select(
         :id,
         :email,
         :first_name,
