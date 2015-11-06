@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -20,12 +19,21 @@ var DBUrl string = fmt.Sprintf(
 	"postgres://%s:%s@%s/%s?sslmode=%s",
 	DBUSER, DBPASS, DBHOST, DATABASE, SSLMODE)
 
-func NewDBConn() (db *sql.DB) {
-	db, err := sql.Open("postgres", DBUrl)
-	if err != nil {
-		log.Print(err)
-		return nil
+var db *sql.DB
+
+func DBConn() (*sql.DB, error) {
+	if db != nil {
+		return db, nil
 	}
 
-	return
+	var err error
+
+	db, err = sql.Open("postgres", DBUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	db.SetMaxIdleConns(5)
+
+	return db, nil
 }

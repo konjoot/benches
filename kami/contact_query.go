@@ -29,10 +29,6 @@ type ContactQuery struct {
 }
 
 func (cq *ContactQuery) All() []*Contact {
-	if cq.conn = NewDBConn(); cq.conn != nil {
-		defer cq.conn.Close()
-	}
-
 	if !cq.fillUsers() {
 		return NewContactList(0).Items()
 	}
@@ -157,11 +153,12 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 }
 
 func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
-	if cq.conn == nil {
-		return nil, errors.New("Can't connect to DB")
+	db, err := DBConn()
+	if err != nil {
+		return nil, err
 	}
 
-	return cq.conn.Prepare(`
+	return db.Prepare(`
 		select	id,
 		      	email,
 		      	first_name,
@@ -177,11 +174,12 @@ func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
 }
 
 func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
-	if cq.conn == nil {
-		return nil, errors.New("Can't connect to DB")
+	db, err := DBConn()
+	if err != nil {
+		return nil, err
 	}
 
-	return cq.conn.Prepare(`
+	return db.Prepare(`
 		select	p.id,
 		      	p.type,
 		      	p.user_id,
