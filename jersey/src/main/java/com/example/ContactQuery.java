@@ -198,7 +198,7 @@ public class ContactQuery {
     + " order by p.user_id, p.id");
 
     Array array = conn.createArrayOf(
-      "integer", collection.stream().map(c -> c.id).toArray()
+      "integer", collection.parallelStream().map(c -> c.id).toArray()
     );
 
     ps.setArray(1, array);
