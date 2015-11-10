@@ -31,16 +31,13 @@ public class ContactQuery {
   }
 
   public List<Contact> all() {
-    this.conn = new DBConn().get();
-
     if (fillUsers()) { fillDependentData(); }
-
-    close(conn);
 
     return collection;
   }
 
   private boolean fillUsers() {
+    this.conn = DBConn.get();
     PreparedStatement ps = null;
     ResultSet rs = null;
 
@@ -71,13 +68,14 @@ public class ContactQuery {
     }
     finally
     {
-      close(rs, ps);
+      close(rs, ps, conn);
     }
 
     return !collection.isEmpty();
   }
 
   private void fillDependentData() {
+    this.conn = DBConn.get();
     PreparedStatement ps = null;
     ResultSet rs = null;
 
@@ -141,7 +139,7 @@ public class ContactQuery {
     }
     finally
     {
-      close(rs, ps);
+      close(rs, ps, conn);
     }
   }
 
