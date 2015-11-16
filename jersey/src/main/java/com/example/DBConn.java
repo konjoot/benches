@@ -17,7 +17,7 @@ import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
 public class DBConn {
   // db settings
   public static final String DBHOST = "localhost";
-  public static final String DATABASE = "lms2_development";
+  public static final String DATABASE = "lms2_development_2";
   public static final String DBUSER = "lms";
   public static final String DBPASS = "";
 
