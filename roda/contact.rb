@@ -8,12 +8,26 @@ module Main
                 :last_name,
                 :middle_name,
                 :date_of_birth,
-                :sex
+                :sex,
+                :profiles
 
-    def initialize(attrs)
-      attrs.each do |key, val|
-        instance_variable_set("@#{key}", val)
-      end
+    def initialize(
+      id:,
+      email:,
+      first_name:,
+      last_name:,
+      middle_name:,
+      date_of_birth:,
+      sex:
+    )
+      @id = id
+      @email = email
+      @first_name = first_name
+      @last_name = last_name
+      @middle_name = middle_name
+      @date_of_birth = date_of_birth
+      @sex = sex
+      @profiles = []
     end
   end
 end
