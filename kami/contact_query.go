@@ -203,7 +203,6 @@ func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
 		    on c.profile_id = p.id
 		  left outer join subjects sb
 		    on c.subject_id = sb.id
-		    and cu.deleted_at is null
 		  where p.deleted_at is null
 		    and p.user_id = any($1::integer[])
 		  order by p.user_id, p.id`)
