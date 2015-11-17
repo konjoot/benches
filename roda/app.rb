@@ -1,7 +1,14 @@
-require "roda"
 require "oj"
+require "roda"
+require "sequel"
 
+require "./db"
+require "./class_unit"
+require "./contact"
 require "./contact_query"
+require "./profile"
+require "./school"
+require "./subject"
 
 module Main
   class App < Roda

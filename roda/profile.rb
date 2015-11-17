@@ -1,8 +1,3 @@
-require "oj"
-
-require "./school"
-require "./class_unit"
-
 module Main
   class Profile
     attr_reader :subjects

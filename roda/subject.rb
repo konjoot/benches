@@ -1,5 +1,3 @@
-require "oj"
-
 module Main
   class Subject
 
