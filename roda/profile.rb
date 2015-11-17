@@ -1,43 +1,53 @@
-require './school'
-require './class_unit'
+require "oj"
+
+require "./school"
+require "./class_unit"
 
 module Main
-  class Profile < Jsonable
-    attr_reader :id,
-                :user_id,
-                :type,
-                :enlisted_on,
-                :left_on,
-                :school,
-                :class_unit,
-                :subjects
+  class Profile
+    attr_reader :subjects
 
     def initialize(
       id:,
-      user_id:,
       type:,
       enlisted_on:,
       left_on:,
       school: {},
       class_unit: {}
     )
-      @id = id
-      @user_id = user_id
-      @type = type
-      @enlisted_on = enlisted_on
-      @left_on = left_on
+      @hash = {}
+      @hash[:Id] = id if id
+      @hash[:Type] = type if type
+      @hash[:EnlistedOn] = enlisted_on if enlisted_on
+      @hash[:LeftOn] = left_on if left_on
 
-      @school = School.new(
+      @hash[:School] = School.new(
         id: school[:id],
         name: school[:name],
-        guid: school[:guid]) if school
+        guid: school[:guid]) if school[:id]
 
-      @class_unit = ClassUnit.new(
+      @hash[:ClassUnit] = ClassUnit.new(
         id: class_unit[:id],
-        name: class_unit[:name]
-      ) if class_unit
+        name: class_unit[:name]) if class_unit[:id]
 
       @subjects = []
+    end
+
+    def id
+      @hash[:Id]
+    end
+
+    def user_id
+      @hash[:UserId]
+    end
+
+    def to_hash
+      @hash[:Subjects] = @subjects if @subjects[0]
+      @hash
+    end
+
+    def to_json
+      Oj.dump(to_hash)
     end
   end
 end
