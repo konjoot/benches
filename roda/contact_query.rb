@@ -73,15 +73,11 @@ module Main
         :sb__name___subject_name
       ).left_outer_join(
         :schools___s,
-        {id: :school_id}
-      ) { |ta|
-        Sequel.qualify(ta, :deleted_at) =~ nil
-      }.left_outer_join(
+        {id: :school_id, deleted_at: nil}
+      ).left_outer_join(
         :class_units___cu,
-        {id: :p__class_unit_id}
-      ) { |ta|
-        Sequel.qualify(ta, :deleted_at) =~ nil
-      }.left_outer_join(
+        {id: :p__class_unit_id, deleted_at: nil}
+      ).left_outer_join(
         :competences___c,
         {profile_id: :p__id}
       ).left_outer_join(
@@ -98,7 +94,6 @@ module Main
         profile = Profile.new(
           id: rec[:id],
           type: rec[:type],
-          user_id: rec[:user_id],
           left_on: rec[:left_on],
           enlisted_on: rec[:enlisted_on],
           school: {
@@ -112,7 +107,7 @@ module Main
           }
         )
 
-        while profile.user_id != current.id
+        while rec[:user_id] != current.id
           begin
             current = icollection.next
           rescue StopIteration
@@ -120,7 +115,7 @@ module Main
           end
         end
 
-        next if current.id != profile.user_id
+        next if current.id != rec[:user_id]
 
         last_pr = current.profiles.last
 
