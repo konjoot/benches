@@ -1,7 +1,8 @@
 package main
 
 import (
-	"encoding/json"
+	// _ "net/http/pprof"
+	// "encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,6 +11,9 @@ import (
 )
 
 func main() {
+	// go func() {
+	// 	http.ListenAndServe("localhost:6060", nil)
+	// }()
 	kami.Get("/contacts", getContacts)
 	kami.Serve()
 }
@@ -36,10 +40,12 @@ func getContacts(
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	err = json.NewEncoder(w).Encode(
-		NewContactQuery(page, perPage).All())
-
+	data, err := NewContactQuery(page, perPage).JSON()
+	// err = json.NewEncoder(w).Encode(
+	// 	NewContactQuery(page, perPage).All())
 	if err != nil {
 		log.Print(err)
 	}
+
+	w.Write(data)
 }

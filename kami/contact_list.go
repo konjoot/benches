@@ -6,13 +6,29 @@ import (
 	"strconv"
 )
 
-func NewContactList(size int) ContactList {
-	return ContactList{i: -1, list: make([]*Contact, 0, size)}
+func NewContactList(size int) *ContactList {
+	return &ContactList{i: -1, list: make([]*Contact, 0, size)}
 }
 
 type ContactList struct {
 	i    int
 	list []*Contact
+}
+
+func (c *ContactList) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	buf.WriteRune('[')
+	listSize := len(c.list)
+	for i := 0; i < listSize; i++ {
+		data, _ := c.list[i].MarshalJSON()
+		buf.Write(data)
+		if i < listSize-1 {
+			buf.WriteRune(',')
+		}
+	}
+	buf.WriteRune(']')
+
+	return buf.Bytes(), nil
 }
 
 func (c *ContactList) Next() *Contact {

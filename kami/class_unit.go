@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"strconv"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -14,8 +17,32 @@ type ClassUnit struct {
 	LeftOn     pq.NullTime
 }
 
+// func (cu *ClassUnit) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(cu)
+// }
+
 func (cu *ClassUnit) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(cu)
+	var buf bytes.Buffer
+	buf.WriteString(`{"id":`)
+	buf.WriteString(strconv.FormatInt(cu.Id.Int64, 10))
+	if cu.Name.Valid {
+		buf.WriteString(`,"name":"`)
+		buf.WriteString(cu.Name.String)
+		buf.WriteRune('"')
+	}
+	if cu.EnlistedOn.Valid {
+		buf.WriteString(`,"enlisted_on":"`)
+		buf.WriteString(cu.EnlistedOn.Time.Format(time.RFC3339))
+		buf.WriteRune('"')
+	}
+	if cu.LeftOn.Valid {
+		buf.WriteString(`,"left_on":"`)
+		buf.WriteString(cu.LeftOn.Time.Format(time.RFC3339))
+		buf.WriteRune('"')
+	}
+	buf.WriteRune('}')
+
+	return buf.Bytes(), nil
 }
 
 func (cu ClassUnit) Value() (driver.Value, error) {

@@ -9,9 +9,9 @@ import (
 
 const (
 	DBHOST   string = "localhost"
-	DATABASE string = "lms2_development_2"
-	DBUSER   string = "lms"
-	DBPASS   string = ""
+	DATABASE string = "mydb"
+	DBUSER   string = "postgres"
+	DBPASS   string = "Xtern1448"
 	SSLMODE  string = "disable"
 )
 
@@ -33,7 +33,8 @@ func DBConn() (*sql.DB, error) {
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(5)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(75)
 
 	return db, nil
 }
