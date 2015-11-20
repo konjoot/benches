@@ -7,9 +7,14 @@ import (
 	"strconv"
 
 	"github.com/guregu/kami"
+
+	// _ "net/http/pprof"
 )
 
 func main() {
+	// go func() {
+	// 	http.ListenAndServe("localhost:6060", nil)
+	// }()
 	kami.Get("/contacts", getContacts)
 	kami.Serve()
 }
@@ -36,8 +41,9 @@ func getContacts(
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	err = json.NewEncoder(w).Encode(
-		NewContactQuery(page, perPage).All())
+	// NewContactQuery(page, perPage).All().JSON(w)
+	out := NewContactQuery(page, perPage).All()
+	err = json.NewEncoder(w).Encode(out)
 
 	if err != nil {
 		log.Print(err)

@@ -1,9 +1,11 @@
 package main
 
 import (
-	"database/sql"
+	// "database/sql"
+	"time"
 
-	"github.com/lib/pq"
+	// "github.com/lib/pq"
+	// "gopkg.in/guregu/null.v3"
 )
 
 func NewContact() *Contact {
@@ -11,19 +13,21 @@ func NewContact() *Contact {
 }
 
 type Contact struct {
-	Id          sql.NullInt64
-	Email       sql.NullString
-	FirstName   sql.NullString
-	LastName    sql.NullString
-	MiddleName  sql.NullString
-	DateOfBirth pq.NullTime
-	Sex         sql.NullInt64
-	Profiles    []*Profile
+	Id          *int32
+	Email       *string
+	FirstName   *string
+	LastName    *string
+	MiddleName  *string    `json:",omitempty"`
+	DateOfBirth *time.Time `json:",omitempty"`
+	Sex         *int32     `json:",omitempty"`
+	Profiles    []*Profile `json:",omitempty"`
+
+	index int
 }
 
-func (c *Contact) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(c)
-}
+// func (c *Contact) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(c)
+// }
 
 func (c *Contact) LastProfile() *Profile {
 	count := len(c.Profiles)
@@ -33,4 +37,12 @@ func (c *Contact) LastProfile() *Profile {
 	}
 
 	return nil
+}
+
+func (c *Contact) SetIndex(i int) {
+	c.index = i
+}
+
+func (c *Contact) GetId() int32 {
+	return *c.Id
 }

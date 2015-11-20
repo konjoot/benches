@@ -1,7 +1,8 @@
 package main
 
 import (
-	"database/sql"
+	// "database/sql"
+	"gopkg.in/guregu/null.v3"
 )
 
 func NewSubject() *Subject {
@@ -9,10 +10,10 @@ func NewSubject() *Subject {
 }
 
 type Subject struct {
-	Id   sql.NullInt64
-	Name sql.NullString
+	Id   null.Int    `json:",omitempty"`
+	Name null.String `json:",omitempty"`
 }
 
-func (s *Subject) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(s)
-}
+// func (s *Subject) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(s)
+// }

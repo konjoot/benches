@@ -1,7 +1,8 @@
 package main
 
 import (
-	"database/sql"
+	// "database/sql"
+	"gopkg.in/guregu/null.v3"
 )
 
 func NewProfile() *Profile {
@@ -9,13 +10,13 @@ func NewProfile() *Profile {
 }
 
 type Profile struct {
-	Id       sql.NullInt64
-	Type     sql.NullString
-	Subjects []*Subject
-	ClassUnit
-	School
+	Id        null.Int    `json:",omitempty"`
+	Type      null.String `json:",omitempty"`
+	Subjects  []*Subject  `json:",omitempty"`
+	ClassUnit ClassUnit   `json:",omitempty"`
+	School    School      `json:",omitempty"`
 }
 
-func (p *Profile) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(p)
-}
+// func (p *Profile) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(p)
+// }
