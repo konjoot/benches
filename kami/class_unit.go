@@ -16,10 +16,6 @@ type ClassUnit struct {
 	LeftOn     pq.NullTime
 }
 
-// func (cu *ClassUnit) MarshalJSON() ([]byte, error) {
-// 	return MarshalJSON(cu)
-// }
-
 func (cu *ClassUnit) MarshalJSON() ([]byte, error) {
 	buf := NewBuffer()
 	defer bufferPool.Put(buf)
