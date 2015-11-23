@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"log"
 	"strconv"
 )
@@ -16,7 +17,9 @@ type ContactList struct {
 }
 
 func (c *ContactList) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteRune('[')
 	listSize := len(c.list)
 	for i := 0; i < listSize; i++ {
@@ -29,6 +32,19 @@ func (c *ContactList) MarshalJSON() ([]byte, error) {
 	buf.WriteRune(']')
 
 	return buf.Bytes(), nil
+}
+
+func (c *ContactList) EncodeJSON(w io.Writer) {
+	w.Write([]byte("["))
+	listSize := len(c.list)
+	for i := 0; i < listSize; i++ {
+		data, _ := c.list[i].MarshalJSON()
+		w.Write(data)
+		if i < listSize-1 {
+			w.Write([]byte(","))
+		}
+	}
+	w.Write([]byte("]"))
 }
 
 func (c *ContactList) Next() *Contact {

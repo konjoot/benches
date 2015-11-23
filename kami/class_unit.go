@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"database/sql/driver"
 	"strconv"
@@ -22,7 +21,9 @@ type ClassUnit struct {
 // }
 
 func (cu *ClassUnit) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteString(`{"id":`)
 	buf.WriteString(strconv.FormatInt(cu.Id.Int64, 10))
 	if cu.Name.Valid {

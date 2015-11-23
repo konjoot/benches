@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"strconv"
 )
@@ -15,12 +14,10 @@ type Subject struct {
 	Name sql.NullString
 }
 
-// func (s *Subject) MarshalJSON() ([]byte, error) {
-// 	return MarshalJSON(s)
-// }
-
 func (s *Subject) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteString(`{"id":`)
 	buf.WriteString(strconv.FormatInt(s.Id.Int64, 10))
 	if s.Name.Valid {

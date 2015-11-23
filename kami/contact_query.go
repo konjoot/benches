@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"io"
 	"log"
 )
 
@@ -50,6 +51,19 @@ func (cq *ContactQuery) JSON() ([]byte, error) {
 	}
 
 	return cq.collection.MarshalJSON()
+}
+
+func (cq *ContactQuery) EncodeJSON(w io.Writer) {
+	if !cq.fillUsers() {
+		NewContactList(0).EncodeJSON(w)
+		return
+	}
+
+	if err := cq.fillDependentData(); err != nil {
+		log.Print(err)
+	}
+
+	cq.collection.EncodeJSON(w)
 }
 
 func (cq *ContactQuery) fillUsers() (ok bool) {

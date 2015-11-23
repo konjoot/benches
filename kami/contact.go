@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"strconv"
 
@@ -23,12 +22,10 @@ type Contact struct {
 	Profiles    []*Profile
 }
 
-// func (c *Contact) MarshalJSON() ([]byte, error) {
-// 	return MarshalJSON(c)
-// }
-
 func (c *Contact) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteString(`{"id":`)
 	buf.WriteString(strconv.FormatInt(c.Id.Int64, 10))
 	if c.Email.Valid {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	// "bytes"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
@@ -14,12 +14,10 @@ type School struct {
 	Guid sql.NullString
 }
 
-// func (s *School) MarshalJSON() ([]byte, error) {
-// 	return MarshalJSON(s)
-// }
-
 func (s *School) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteString(`{"id":`)
 	buf.WriteString(strconv.FormatInt(s.Id.Int64, 10))
 	if s.Name.Valid {

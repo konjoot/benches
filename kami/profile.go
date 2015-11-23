@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"strconv"
 )
@@ -18,12 +17,10 @@ type Profile struct {
 	School    School
 }
 
-// func (p *Profile) MarshalJSON() ([]byte, error) {
-// 	return MarshalJSON(p)
-// }
-
 func (p *Profile) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	buf := NewBuffer()
+	defer bufferPool.Put(buf)
+
 	buf.WriteString(`{"id":`)
 	buf.WriteString(strconv.FormatInt(p.Id.Int64, 10))
 	if p.Type.Valid {
