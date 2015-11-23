@@ -96,7 +96,7 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 	}
 	defer rows.Close()
 
-	var userId sql.NullInt64
+	var userId *int32
 
 	current := cq.collection.Next()
 
@@ -123,7 +123,7 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 			&subject.Name,
 		)
 
-		for current.Id != userId {
+		for *current.Id != *userId {
 			if next := cq.collection.Next(); next != nil {
 				current = next
 			} else {
@@ -131,17 +131,17 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 			}
 		}
 
-		if current.Id != userId {
+		if *current.Id != *userId {
 			continue
 		}
 
 		if lastPr := current.LastProfile(); lastPr == nil {
 			current.Profiles = append(current.Profiles, profile)
-		} else if lastPr.Id != profile.Id {
+		} else if *lastPr.Id != *profile.Id {
 			current.Profiles = append(current.Profiles, profile)
 		}
 
-		if subject.Id.Valid {
+		if subject.Id != nil {
 			current.LastProfile().Subjects = append(
 				current.LastProfile().Subjects,
 				subject,

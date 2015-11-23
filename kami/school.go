@@ -1,24 +1,21 @@
 package main
 
-import (
-	"database/sql"
-	"database/sql/driver"
-)
+import ()
 
 type School struct {
-	Id   sql.NullInt64
-	Name sql.NullString
-	Guid sql.NullString
+	Id   *int32
+	Name *string
+	Guid *string
 }
 
-func (s *School) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(s)
-}
+// func (s *School) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(s)
+// }
 
-func (s School) Value() (driver.Value, error) {
-	if s.Id.Valid || s.Name.Valid || s.Guid.Valid {
-		return &s, nil
-	}
+// func (s School) Value() (driver.Value, error) {
+// 	if s.Id.Valid || s.Name.Valid || s.Guid.Valid {
+// 		return &s, nil
+// 	}
 
-	return nil, nil
-}
+// 	return nil, nil
+// }

@@ -1,18 +1,16 @@
 package main
 
-import (
-	"database/sql"
-)
+import ()
 
 func NewSubject() *Subject {
 	return &Subject{}
 }
 
 type Subject struct {
-	Id   sql.NullInt64
-	Name sql.NullString
+	Id   *int32
+	Name *string
 }
 
-func (s *Subject) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(s)
-}
+// func (s *Subject) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(s)
+// }

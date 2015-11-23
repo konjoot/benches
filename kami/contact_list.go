@@ -35,9 +35,8 @@ func (c ContactList) Ids() []byte {
 
 	strings := make([][]byte, 0)
 	for _, next := range c.list {
-		if id, err := next.Id.Value(); err == nil {
-			strings = append(strings, []byte(strconv.FormatInt(id.(int64), 10)))
-		}
+		id := *next.Id
+		strings = append(strings, []byte(strconv.FormatInt(int64(id), 10)))
 	}
 	result := bytes.Join(strings, []byte(","))
 

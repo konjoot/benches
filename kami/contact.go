@@ -1,9 +1,7 @@
 package main
 
 import (
-	"database/sql"
-
-	"github.com/lib/pq"
+	"time"
 )
 
 func NewContact() *Contact {
@@ -11,19 +9,19 @@ func NewContact() *Contact {
 }
 
 type Contact struct {
-	Id          sql.NullInt64
-	Email       sql.NullString
-	FirstName   sql.NullString
-	LastName    sql.NullString
-	MiddleName  sql.NullString
-	DateOfBirth pq.NullTime
-	Sex         sql.NullInt64
+	Id          *int32
+	Email       *string
+	FirstName   *string
+	LastName    *string
+	MiddleName  *string
+	DateOfBirth *time.Time
+	Sex         *int32
 	Profiles    []*Profile
 }
 
-func (c *Contact) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(c)
-}
+// func (c *Contact) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(c)
+// }
 
 func (c *Contact) LastProfile() *Profile {
 	count := len(c.Profiles)

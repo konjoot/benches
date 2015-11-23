@@ -1,21 +1,19 @@
 package main
 
-import (
-	"database/sql"
-)
+import ()
 
 func NewProfile() *Profile {
 	return &Profile{}
 }
 
 type Profile struct {
-	Id       sql.NullInt64
-	Type     sql.NullString
-	Subjects []*Subject
-	ClassUnit
-	School
+	Id        *int32
+	Type      *string
+	Subjects  []*Subject
+	ClassUnit ClassUnit
+	School    School
 }
 
-func (p *Profile) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(p)
-}
+// func (p *Profile) MarshalJSON() ([]byte, error) {
+// 	return MarshalJSON(p)
+// }
