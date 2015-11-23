@@ -36,8 +36,8 @@ func getContacts(
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	err = json.NewEncoder(w).Encode(
-		NewContactQuery(page, perPage).All())
+	contacts := NewContactQuery(page, perPage).All()
+	err = json.NewEncoder(w).Encode(contacts)
 
 	if err != nil {
 		log.Print(err)

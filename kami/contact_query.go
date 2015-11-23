@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"log"
 )
@@ -25,7 +24,6 @@ type ContactQuery struct {
 	limit      int
 	offset     int
 	collection ContactList
-	conn       *sql.DB
 }
 
 func (cq *ContactQuery) All() []*Contact {
@@ -53,13 +51,12 @@ func (cq *ContactQuery) fillUsers() (ok bool) {
 		}
 	}()
 
-	ps, err := cq.selectUsersStmt()
+	conn, err := DBConn()
 	if err != nil {
 		return
 	}
-	defer ps.Close()
 
-	rows, err := ps.Query(cq.limit, cq.offset)
+	rows, err := conn.Query(cq.selectUsersStmt(), cq.limit, cq.offset)
 	if err != nil {
 		return
 	}
@@ -84,13 +81,12 @@ func (cq *ContactQuery) fillUsers() (ok bool) {
 }
 
 func (cq *ContactQuery) fillDependentData() (err error) {
-	ps, err := cq.selectDependentDataStmt()
+	conn, err := DBConn()
 	if err != nil {
 		return
 	}
-	defer ps.Close()
 
-	rows, err := ps.Query(cq.collection.Ids())
+	rows, err := conn.Query(cq.selectDependentDataStmt(), cq.collection.Ids())
 	if err != nil {
 		return
 	}
@@ -107,21 +103,31 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 	for rows.Next() {
 
 		profile := NewProfile()
+		school := NewSchool()
+		classUnit := NewClassUnit()
 		subject := NewSubject()
 		rows.Scan(
 			&profile.Id,
 			&profile.Type,
 			&userId,
-			&profile.School.Id,
-			&profile.School.Name,
-			&profile.School.Guid,
-			&profile.ClassUnit.Id,
-			&profile.ClassUnit.Name,
-			&profile.ClassUnit.EnlistedOn,
-			&profile.ClassUnit.LeftOn,
+			&school.Id,
+			&school.Name,
+			&school.Guid,
+			&classUnit.Id,
+			&classUnit.Name,
+			&classUnit.EnlistedOn,
+			&classUnit.LeftOn,
 			&subject.Id,
 			&subject.Name,
 		)
+
+		if school.Id != nil {
+			profile.School = school
+		}
+
+		if classUnit.Id != nil {
+			profile.ClassUnit = classUnit
+		}
 
 		for *current.Id != *userId {
 			if next := cq.collection.Next(); next != nil {
@@ -152,13 +158,8 @@ func (cq *ContactQuery) fillDependentData() (err error) {
 	return
 }
 
-func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
-	db, err := DBConn()
-	if err != nil {
-		return nil, err
-	}
-
-	return db.Prepare(`
+func (cq *ContactQuery) selectUsersStmt() string {
+	return `
 		select	id,
 		      	email,
 		      	first_name,
@@ -170,16 +171,11 @@ func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
 		  where deleted_at is null
 		  order by id
 		  limit $1
-		  offset $2`)
+		  offset $2`
 }
 
-func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
-	db, err := DBConn()
-	if err != nil {
-		return nil, err
-	}
-
-	return db.Prepare(`
+func (cq *ContactQuery) selectDependentDataStmt() string {
+	return `
 		select	p.id,
 		      	p.type,
 		      	p.user_id,
@@ -205,5 +201,5 @@ func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
 		    on c.subject_id = sb.id
 		  where p.deleted_at is null
 		    and p.user_id = any($1::integer[])
-		  order by p.user_id, p.id`)
+		  order by p.user_id, p.id`
 }

@@ -1,39 +1,35 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx"
 )
 
-const (
-	DBHOST   string = "localhost"
-	DATABASE string = "lms2_db_dev"
-	DBUSER   string = "lms2_db_user"
-	DBPASS   string = "lms_2014"
-	SSLMODE  string = "disable"
-)
+var connConfig = pgx.ConnConfig{
+	Host:      "localhost",
+	Database:  "lms2_db_dev",
+	User:      "lms2_db_user",
+	Password:  "lms_2014",
+	TLSConfig: nil,
+}
 
-var DBUrl string = fmt.Sprintf(
-	"postgres://%s:%s@%s/%s?sslmode=%s",
-	DBUSER, DBPASS, DBHOST, DATABASE, SSLMODE)
+var config = pgx.ConnPoolConfig{
+	ConnConfig:     connConfig,
+	MaxConnections: 5,
+}
 
-var db *sql.DB
+var dbPool *pgx.ConnPool
 
-func DBConn() (*sql.DB, error) {
-	if db != nil {
-		return db, nil
+func DBConn() (*pgx.ConnPool, error) {
+	if dbPool != nil {
+		return dbPool, nil
 	}
 
 	var err error
 
-	db, err = sql.Open("postgres", DBUrl)
+	dbPool, err = pgx.NewConnPool(config)
 	if err != nil {
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(5)
-
-	return db, nil
+	return dbPool, nil
 }

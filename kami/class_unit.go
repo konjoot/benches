@@ -4,11 +4,15 @@ import (
 	"time"
 )
 
+func NewClassUnit() *ClassUnit {
+	return &ClassUnit{}
+}
+
 type ClassUnit struct {
 	Id         *int32
 	Name       *string
-	EnlistedOn *time.Time
-	LeftOn     *time.Time
+	EnlistedOn *time.Time `json:,omitempty`
+	LeftOn     *time.Time `json:,omitempty`
 }
 
 // func (cu *ClassUnit) MarshalJSON() ([]byte, error) {

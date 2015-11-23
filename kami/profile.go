@@ -9,9 +9,9 @@ func NewProfile() *Profile {
 type Profile struct {
 	Id        *int32
 	Type      *string
-	Subjects  []*Subject
-	ClassUnit ClassUnit
-	School    School
+	Subjects  []*Subject `json:,omitempty`
+	ClassUnit *ClassUnit `json:,omitempty`
+	School    *School    `json:,omitempty`
 }
 
 // func (p *Profile) MarshalJSON() ([]byte, error) {

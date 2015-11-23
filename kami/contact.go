@@ -13,10 +13,10 @@ type Contact struct {
 	Email       *string
 	FirstName   *string
 	LastName    *string
-	MiddleName  *string
-	DateOfBirth *time.Time
-	Sex         *int32
-	Profiles    []*Profile
+	MiddleName  *string    `json:,omitempty`
+	DateOfBirth *time.Time `json:,omitempty`
+	Sex         *int32     `json:,omitempty`
+	Profiles    []*Profile `json:,omitempty`
 }
 
 // func (c *Contact) MarshalJSON() ([]byte, error) {

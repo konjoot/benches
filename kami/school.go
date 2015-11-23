@@ -2,6 +2,10 @@ package main
 
 import ()
 
+func NewSchool() *School {
+	return &School{}
+}
+
 type School struct {
 	Id   *int32
 	Name *string
