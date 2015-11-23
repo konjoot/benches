@@ -9,9 +9,9 @@ import (
 
 const (
 	DBHOST   string = "localhost"
-	DATABASE string = "mydb"
-	DBUSER   string = "postgres"
-	DBPASS   string = "Xtern1448"
+	DATABASE string = "lms2_development_2"
+	DBUSER   string = "lms"
+	DBPASS   string = ""
 	SSLMODE  string = "disable"
 )
 
