@@ -33,7 +33,8 @@ func DBConn() (*sql.DB, error) {
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(5)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(75)
 
 	return db, nil
 }

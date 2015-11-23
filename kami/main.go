@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -36,10 +35,5 @@ func getContacts(
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	err = json.NewEncoder(w).Encode(
-		NewContactQuery(page, perPage).All())
-
-	if err != nil {
-		log.Print(err)
-	}
+	NewContactQuery(page, perPage).EncodeJSON(w)
 }

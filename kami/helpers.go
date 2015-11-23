@@ -7,7 +7,23 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sync"
 )
+
+var bufferPool sync.Pool
+
+type Buffer struct {
+	bytes.Buffer
+}
+
+func NewBuffer() *Buffer {
+	if v := bufferPool.Get(); v != nil {
+		b := v.(*Buffer)
+		b.Reset()
+		return b
+	}
+	return new(Buffer)
+}
 
 func MarshalJSON(i interface{}) (res []byte, err error) {
 	defer func() {
