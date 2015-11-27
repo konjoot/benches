@@ -1,13 +1,27 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/guregu/kami"
 )
+
+var bufPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
+func init() {
+	DBConn()
+	// PgxDBConn()
+	// PgDBConn()
+}
 
 func main() {
 	kami.Get("/contacts", getContacts)
@@ -36,8 +50,14 @@ func getContacts(
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	err = json.NewEncoder(w).Encode(
-		NewContactQuery(page, perPage).All())
+	contacts := NewContactQuery(page, perPage).All()
+	// contacts := NewPGXContactQuery(page, perPage).All()
+	// contacts := NewPGContactQuery(page, perPage).All()
+	buf := bufPool.Get().(*bytes.Buffer)
+	err = json.NewEncoder(buf).Encode(contacts)
+	w.Write(buf.Bytes())
+	buf.Reset()
+	bufPool.Put(buf)
 
 	if err != nil {
 		log.Print(err)
