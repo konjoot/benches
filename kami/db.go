@@ -1,10 +1,10 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
 const (
@@ -19,21 +19,22 @@ var DBUrl string = fmt.Sprintf(
 	"postgres://%s:%s@%s/%s?sslmode=%s",
 	DBUSER, DBPASS, DBHOST, DATABASE, SSLMODE)
 
-var db *sql.DB
+var db *sqlx.DB
 
-func DBConn() (*sql.DB, error) {
+func DBConn() (*sqlx.DB, error) {
 	if db != nil {
 		return db, nil
 	}
 
 	var err error
 
-	db, err = sql.Open("postgres", DBUrl)
+	db, err = sqlx.Open("pgx", DBUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	db.SetMaxIdleConns(5)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(75)
 
 	return db, nil
 }
