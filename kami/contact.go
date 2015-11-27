@@ -1,28 +1,20 @@
 package main
 
-import (
-	"database/sql"
-
-	"github.com/lib/pq"
-)
+import "time"
 
 func NewContact() *Contact {
 	return &Contact{}
 }
 
 type Contact struct {
-	Id          sql.NullInt64
-	Email       sql.NullString
-	FirstName   sql.NullString
-	LastName    sql.NullString
-	MiddleName  sql.NullString
-	DateOfBirth pq.NullTime
-	Sex         sql.NullInt64
-	Profiles    []*Profile
-}
-
-func (c *Contact) MarshalJSON() ([]byte, error) {
-	return MarshalJSON(c)
+	Id          *int32     `json:"id,omitempty"`
+	Email       *string    `json:"email,omitempty"`
+	FirstName   *string    `json:"firstName,omitempty"`
+	LastName    *string    `json:"lastName,omitempty"`
+	MiddleName  *string    `json:"middleName,omitempty"`
+	DateOfBirth *time.Time `json:"dateOfBirth,omitempty"`
+	Sex         *int32     `json:"sex,omitempty"`
+	Profiles    []*Profile `json:"profiles,omitempty"`
 }
 
 func (c *Contact) LastProfile() *Profile {
