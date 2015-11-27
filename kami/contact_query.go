@@ -1,164 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
-func NewContactQuery(page int, perPage int) *ContactQuery {
-	if page < 1 {
-		page = 1
-	}
-	if perPage < 1 {
-		perPage = 1
-	}
-
-	return &ContactQuery{
-		limit:      perPage,
-		offset:     perPage * (page - 1),
-		collection: NewContactList(perPage),
-	}
-}
-
-type ContactQuery struct {
-	limit      int
-	offset     int
-	collection ContactList
-	conn       *sql.DB
-}
-
-func (cq *ContactQuery) All() []*Contact {
-	if !cq.fillUsers() {
-		return NewContactList(0).Items()
-	}
-
-	if err := cq.fillDependentData(); err != nil {
-		log.Print(err)
-	}
-
-	return cq.collection.Items()
-}
-
-func (cq *ContactQuery) fillUsers() (ok bool) {
-	var err error
-
-	defer func() {
-		if err != nil {
-			log.Print(err)
-		}
-
-		if cq.collection.Any() {
-			ok = true
-		}
-	}()
-
-	ps, err := cq.selectUsersStmt()
-	if err != nil {
-		return
-	}
-	defer ps.Close()
-
-	rows, err := ps.Query(cq.limit, cq.offset)
-	if err != nil {
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		contact := NewContact()
-		rows.Scan(
-			&contact.Id,
-			&contact.Email,
-			&contact.FirstName,
-			&contact.LastName,
-			&contact.MiddleName,
-			&contact.DateOfBirth,
-			&contact.Sex,
-		)
-
-		cq.collection.Append(contact)
-	}
-
-	return
-}
-
-func (cq *ContactQuery) fillDependentData() (err error) {
-	ps, err := cq.selectDependentDataStmt()
-	if err != nil {
-		return
-	}
-	defer ps.Close()
-
-	rows, err := ps.Query(cq.collection.Ids())
-	if err != nil {
-		return
-	}
-	defer rows.Close()
-
-	var userId sql.NullInt64
-
-	current := cq.collection.Next()
-
-	if current == nil {
-		return errors.New("Empty collection")
-	}
-
-	for rows.Next() {
-
-		profile := NewProfile()
-		subject := NewSubject()
-		rows.Scan(
-			&profile.Id,
-			&profile.Type,
-			&userId,
-			&profile.School.Id,
-			&profile.School.Name,
-			&profile.School.Guid,
-			&profile.ClassUnit.Id,
-			&profile.ClassUnit.Name,
-			&profile.ClassUnit.EnlistedOn,
-			&profile.ClassUnit.LeftOn,
-			&subject.Id,
-			&subject.Name,
-		)
-
-		for current.Id != userId {
-			if next := cq.collection.Next(); next != nil {
-				current = next
-			} else {
-				break
-			}
-		}
-
-		if current.Id != userId {
-			continue
-		}
-
-		if lastPr := current.LastProfile(); lastPr == nil {
-			current.Profiles = append(current.Profiles, profile)
-		} else if lastPr.Id != profile.Id {
-			current.Profiles = append(current.Profiles, profile)
-		}
-
-		if subject.Id.Valid {
-			current.LastProfile().Subjects = append(
-				current.LastProfile().Subjects,
-				subject,
-			)
-		}
-	}
-
-	return
-}
-
-func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
-	db, err := DBConn()
-	if err != nil {
-		return nil, err
-	}
-
-	return db.Prepare(`
+const (
+	USERS_QUERY = `
 		select	id,
 		      	email,
 		      	first_name,
@@ -169,17 +19,10 @@ func (cq *ContactQuery) selectUsersStmt() (*sql.Stmt, error) {
 		  from users
 		  where deleted_at is null
 		  order by id
-		  limit $1
-		  offset $2`)
-}
+		  limit ?
+		  offset ?;`
 
-func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
-	db, err := DBConn()
-	if err != nil {
-		return nil, err
-	}
-
-	return db.Prepare(`
+	PROFILES_QUERY = `
 		select	p.id,
 		      	p.type,
 		      	p.user_id,
@@ -204,6 +47,173 @@ func (cq *ContactQuery) selectDependentDataStmt() (*sql.Stmt, error) {
 		  left outer join subjects sb
 		    on c.subject_id = sb.id
 		  where p.deleted_at is null
-		    and p.user_id = any($1::integer[])
-		  order by p.user_id, p.id`)
+		    and p.user_id in (?)
+		  order by p.user_id, p.id;`
+)
+
+func NewContactQuery(page int, perPage int) *ContactQuery {
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 {
+		perPage = 1
+	}
+
+	return &ContactQuery{
+		limit:      perPage,
+		offset:     perPage * (page - 1),
+		collection: NewContactList(perPage),
+	}
+}
+
+type ContactQuery struct {
+	limit      int
+	offset     int
+	collection ContactList
+}
+
+func (cq *ContactQuery) All() []*Contact {
+	if !cq.fillUsers() {
+		return NewContactList(0).Items
+	}
+
+	if err := cq.fillDependentData(); err != nil {
+		log.Print(err)
+	}
+
+	return cq.collection.Items
+}
+
+func (cq *ContactQuery) fillUsers() (ok bool) {
+	var err error
+
+	defer func() {
+		if err != nil {
+			log.Print(err)
+		}
+
+		if cq.collection.Any() {
+			ok = true
+		}
+	}()
+
+	db, err := DBConn()
+	if err != nil {
+		return
+	}
+
+	query := db.Rebind(USERS_QUERY)
+
+	rows, err := db.Queryx(query, cq.limit, cq.offset)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	var contact *Contact
+	for rows.Next() {
+		contact = NewContact()
+		rows.Scan(
+			&contact.Id,
+			&contact.Email,
+			&contact.FirstName,
+			&contact.LastName,
+			&contact.MiddleName,
+			&contact.DateOfBirth,
+			&contact.Sex,
+		)
+		cq.collection.Items = append(cq.collection.Items, contact)
+	}
+
+	return
+}
+
+func (cq *ContactQuery) fillDependentData() (err error) {
+	db, err := DBConn()
+	if err != nil {
+		return
+	}
+
+	query, args, err := sqlx.In(PROFILES_QUERY, cq.collection.Ids())
+	if err != nil {
+		return
+	}
+
+	query = db.Rebind(query)
+
+	rows, err := db.Queryx(query, args...)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	current := cq.collection.Next()
+
+	if current == nil {
+		return errors.New("Empty collection")
+	}
+
+	var (
+		profile   *Profile
+		classUnit *ClassUnit
+		school    *School
+		subject   *Subject
+	)
+
+	for rows.Next() {
+		profile = NewProfile()
+		classUnit = NewClassUnit()
+		school = NewSchool()
+		subject = NewSubject()
+
+		rows.Scan(
+			&profile.Id,
+			&profile.Type,
+			&profile.UserId,
+			&school.Id,
+			&school.Name,
+			&school.Guid,
+			&classUnit.Id,
+			&classUnit.Name,
+			&classUnit.EnlistedOn,
+			&classUnit.LeftOn,
+			&subject.Id,
+			&subject.Name,
+		)
+
+		for *current.Id != *profile.UserId {
+			if next := cq.collection.Next(); next != nil {
+				current = next
+			} else {
+				break
+			}
+		}
+
+		if *current.Id != *profile.UserId {
+			continue
+		}
+
+		if classUnit.Id != nil {
+			profile.ClassUnit = classUnit
+		}
+
+		if school.Id != nil {
+			profile.School = school
+		}
+
+		if lastPr := current.LastProfile(); lastPr == nil {
+			current.Profiles = append(current.Profiles, profile)
+		} else if *lastPr.Id != *profile.Id {
+			current.Profiles = append(current.Profiles, profile)
+		}
+
+		if subject.Id != nil {
+			current.LastProfile().Subjects = append(
+				current.LastProfile().Subjects,
+				subject,
+			)
+		}
+	}
+
+	return
 }
