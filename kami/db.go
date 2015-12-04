@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -28,7 +28,7 @@ func DBConn() (*sqlx.DB, error) {
 
 	var err error
 
-	db, err = sqlx.Open("pgx", DBUrl)
+	db, err = sqlx.Open("postgres", DBUrl)
 	if err != nil {
 		return nil, err
 	}

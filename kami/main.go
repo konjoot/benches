@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/guregu/kami"
+	_ "net/http/pprof"
 )
 
 var bufPool = sync.Pool{
@@ -24,6 +25,9 @@ func init() {
 }
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	kami.Get("/contacts", getContacts)
 	kami.Serve()
 }

@@ -24,22 +24,26 @@ func (c ContactList) Any() bool {
 	return len(c.Items) > 0
 }
 
-func (c ContactList) Ids() []int32 {
-	arr := make([]int32, len(c.Items))
+// func (c ContactList) Ids() []int {
+// 	arr := make([]int, len(c.Items))
 
-	for i, contact := range c.Items {
-		arr[i] = *contact.Id
-	}
+// 	for i, contact := range c.Items {
+// 		arr[i] = contact.Id
+// 	}
 
-	return arr
-}
+// 	return arr
+// }
 
-func (c ContactList) IntIds() []int {
-	arr := make([]int, len(c.Items))
+// func (c ContactList) IntIds() []int {
+// 	arr := make([]int, len(c.Items))
 
-	for i, contact := range c.Items {
-		arr[i] = int(*contact.Id)
-	}
+// 	for i, contact := range c.Items {
+// 		arr[i] = int(contact.Id)
+// 	}
 
-	return arr
-}
+// 	return arr
+// }
+
+// func (cl *ContactList) Append(c Contact) {
+// 	cl.Items = append(cl.Items, &c)
+// }
